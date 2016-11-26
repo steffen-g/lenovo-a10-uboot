@@ -281,7 +281,8 @@ struct fastboot_boot_img_hdr {
 
 struct bootloader_message;
 
-#ifdef	CONFIG_CMD_FASTBOOT
+
+
 enum fbt_reboot_type {
 	FASTBOOT_REBOOT_UNKNOWN, /* typically for a cold boot */
 	FASTBOOT_REBOOT_NORMAL,
@@ -292,6 +293,8 @@ enum fbt_reboot_type {
 	FASTBOOT_REBOOT_FASTBOOT,
 	FASTBOOT_REBOOT_CHARGE,
 };
+#ifdef  CONFIG_CMD_FASTBOOT
+
 extern void fbt_preboot(void);
 
 #ifdef CONFIG_FASTBOOT_LOG

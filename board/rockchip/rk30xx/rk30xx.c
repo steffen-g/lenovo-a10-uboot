@@ -197,7 +197,7 @@ int arch_interrupt_init (void)
 {
 	if(!rk30_interrupt_inited)
 	{
-		printf("arch_interrupt_init\n");
+		//printf("arch_interrupt_init\n");
 		InterruptInit();
 		//rk30_reg_irq(irq_init_reg);
 		rk30_interrupt_inited = 1;
@@ -407,6 +407,7 @@ void board_fbt_boot_failed(const char* boot)
 extern char bootloader_ver[];
 
 #ifdef CONFIG_BOARD_LATE_INIT
+char lcd_is_active=0;
 int board_late_init(void)
 {
     printf("board_late_init\n");
@@ -419,7 +420,12 @@ int board_late_init(void)
 	pmic_init(0);
 #endif
 
-    SecureBootCheck();
+	rk_backlight_ctrl(50);
+	drv_lcd_init();
+	lcd_printf("A10 U-Boot\n");
+	lcd_is_active=1;
+/*
+    //SecureBootCheck();
 	get_bootloader_ver(NULL);
 	printf("##################################################\n");
 	printf("uboot version: %s\n",U_BOOT_VERSION_STRING);
@@ -442,7 +448,7 @@ int board_late_init(void)
         tmp_buf[sizeof(tmp_buf)-1] = 0;
         setenv("fbt_sn#", tmp_buf);
     }
-    fbt_preboot();
+    fbt_preboot();*/
 	return 0;
 }
 #endif
@@ -477,10 +483,17 @@ void rk_backlight_ctrl(int brightness)
     int total = 0x4b0;
     int pwm = total * (100 - brightness) / 100;
     int *addr =0;
+	
+	printf("backlight --- brightness:%d\n", brightness);
+
+    //g_3188_grfReg->GRF_GPIO_IOMUX[3].GPIOD_IOMUX |= ((1<<12)<<16)|(1<<12);   // pwm3, gpio3_d6
 
 
-    g_3188_grfReg->GRF_GPIO_IOMUX[3].GPIOD_IOMUX |= ((1<<12)<<16)|(1<<12);   // pwm3, gpio3_d6
-
+	SetPortOutput(3,13,1); // bl pwm?
+int i;
+//for(i=26; i<30; i++)
+	SetPortOutput(3,28,1); //lvds tx shdn
+	SetPortOutput(0,8,0); //LCD en?! 
     //SetPortOutput(3,30,0);   //gpio3_d6 0
     write_pwm_reg(id, 0x0c, 0x80);
     write_pwm_reg(id, 0x08, total);
@@ -490,6 +503,36 @@ void rk_backlight_ctrl(int brightness)
     g_3188_grfReg->GRF_GPIO_IOMUX[3].GPIOD_IOMUX |= ((1<<12)<<16)|(1<<12);   // pwm3, gpio3_d6
 
     SetPortOutput(0,2, pwm != total);   //gpio0_a2 1 ,backlight enable
+    
+    // mux lcdc1
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOD_IOMUX |= ((1<<6)<<16)|(1<<6);   //gpio2_d3 lcdc1_vsync
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOD_IOMUX |= ((1<<4)<<16)|(1<<4);   //gpio2_d2 lcdc1_hsync
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOD_IOMUX |= ((1<<2)<<16)|(1<<2);   //gpio2_d1 lcdc1_den
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOD_IOMUX |= ((1<<0)<<16)|(1<<0);   //gpio2_d0 lcdc1_dclk
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<0)<<16)|(1<<0);   //gpio2_a0 lcdc1_d0
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<2)<<16)|(1<<2);   //gpio2_a1 lcdc1_d1
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<4)<<16)|(1<<4);   //gpio2_a1 lcdc1_d2
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<6)<<16)|(1<<6);   //gpio2_a1 lcdc1_d3
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<8)<<16)|(1<<8);   //gpio2_a1 lcdc1_d4
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<10)<<16)|(1<<10);   //gpio2_a1 lcdc1_d5
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<12)<<16)|(1<<12);   //gpio2_a1 lcdc1_d6
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOA_IOMUX |= ((1<<14)<<16)|(1<<14);   //gpio2_a1 lcdc1_d7
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<0)<<16)|(1<<0);   //gpio2_a0 lcdc1_d0
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<2)<<16)|(1<<2);   //gpio2_a1 lcdc1_d1
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<4)<<16)|(1<<4);   //gpio2_a1 lcdc1_d2
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<6)<<16)|(1<<6);   //gpio2_a1 lcdc1_d3
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<8)<<16)|(1<<8);   //gpio2_a1 lcdc1_d4
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<10)<<16)|(1<<10);   //gpio2_a1 lcdc1_d5
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<12)<<16)|(1<<12);   //gpio2_a1 lcdc1_d6
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOB_IOMUX |= ((1<<14)<<16)|(1<<14);   //gpio2_a1 lcdc1_d7    
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<0)<<16)|(1<<0);   //gpio2_a0 lcdc1_d0
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<2)<<16)|(1<<2);   //gpio2_a1 lcdc1_d1
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<4)<<16)|(1<<4);   //gpio2_a1 lcdc1_d2
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<6)<<16)|(1<<6);   //gpio2_a1 lcdc1_d3
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<8)<<16)|(1<<8);   //gpio2_a1 lcdc1_d4
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<10)<<16)|(1<<10);   //gpio2_a1 lcdc1_d5
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<12)<<16)|(1<<12);   //gpio2_a1 lcdc1_d6
+    g_3188_grfReg->GRF_GPIO_IOMUX[2].GPIOC_IOMUX |= ((1<<14)<<16)|(1<<14);   //gpio2_a1 lcdc1_d7   
     
     #endif
 }
@@ -509,7 +552,7 @@ void rk_fb_init(unsigned int onoff)
 
 vidinfo_t panel_info = {
     .lcd_face    = OUT_D888_P666,
-	.vl_freq	= 71,  
+	.vl_freq	= 64,  
 	.vl_col		= 1280,
 	.vl_row		= 800,
 	.vl_width	= 1280,
@@ -522,12 +565,12 @@ vidinfo_t panel_info = {
 
 	/* Panel infomation */
 	.vl_hspw	= 10,
-	.vl_hbpd	= 100,
-	.vl_hfpd	= 18,
+	.vl_hbpd	= 166,
+	.vl_hfpd	= 8,
 
-	.vl_vspw	= 2,
-	.vl_vbpd	= 8,
-	.vl_vfpd	= 6,
+	.vl_vspw	= 1,
+	.vl_vbpd	= 4,
+	.vl_vfpd	= 3,
 
 	.lcd_power_on = NULL,
 	.mipi_power = NULL,
@@ -545,12 +588,24 @@ vidinfo_t panel_info = {
 #endif
 };
 
+struct fb_dsp_info fb_info = {
+	.xact = 1280,
+	.yact = 800,
+	.xsize = 1280,
+	.ysize = 800,
+	.xvir = 1280,
+	.yvir = 800,
+	.xpos = 0,
+	.ypos = 0,
+};
+
 void init_panel_info(vidinfo_t *vid)
 {
 	vid->logo_on	= 1;
     vid->enable_ldo = rk_fb_init;
     vid->backlight_on = rk_backlight_ctrl;   //move backlight enable to fbt_preboot, for don't show logo in rockusb
     vid->logo_rgb_mode = RGB565;
+    vid->par[0].fb_info = fb_info;
 }
 
 #ifdef CONFIG_RK616

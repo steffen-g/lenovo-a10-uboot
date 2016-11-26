@@ -37,22 +37,27 @@ typedef volatile struct tagLCDC_REG
 	unsigned int DSP_CTRL0;				 //0x04 display control register 0
 	unsigned int DSP_CTRL1;				 //0x08 display control register 1
 	unsigned int MCU_CTRL ;				 //0x0c MCU mode contol register
+	
 	unsigned int INT_STATUS;             //0x10 Interrupt status register
 	unsigned int ALPHA_CTRL;             //0x14 Blending control register
 	unsigned int WIN0_COLOR_KEY_CTRL;     //0x18 Win0 blending control register
 	unsigned int WIN1_COLOR_KEY_CTRL;     //0x1C Win1 blending control register
+	
 	unsigned int WIN0_YRGB_MST0;           //0x20 Win0 active YRGB memory start address0
 	unsigned int WIN0_CBR_MST0;            //0x24 Win0 active Cbr memory start address0
 	unsigned int WIN0_YRGB_MST1;           //0x28 Win0 active YRGB memory start address1
 	unsigned int WIN0_CBR_MST1;            //0x2C Win0 active Cbr memory start address1
+	
     unsigned int WIN0_VIR;                //0x30 WIN0 virtual display width/height
 	unsigned int WIN0_ACT_INFO;           //0x34 Win0 active window width/height
 	unsigned int WIN0_DSP_INFO;           //0x38 Win0 display width/height on panel
 	unsigned int WIN0_DSP_ST;             //0x3c Win0 display start point on panel
+	
     unsigned int WIN0_SCL_FACTOR_YRGB;    //0x40 Win0 YRGB scaling  factor setting
 	unsigned int WIN0_SCL_FACTOR_CBR;     //0x44 Win0 YRGB scaling factor setting
 	unsigned int WIN0_SCL_OFFSET;         //0x48 Win0 Cbr scaling start point offset
 	unsigned int WIN1_MST;                //0x4c Win1 active YRGB memory start address
+	
     unsigned int WIN1_DSP_INFO;           //0x50 Win1 display width/height on panel
     unsigned int WIN1_DSP_ST;             //0x54 Win1 display start point on panel
 	unsigned int HWC_MST;                 //0x58 HWC memory start address
@@ -317,7 +322,7 @@ typedef volatile struct tagLCDC_REG
 #define v_VAEP(x) 		(((x)&0xfff)<<0)
 #define v_VASP(x) 		(((x)&0xfff)<<16)
 
-#define preg ((pLCDC_REG)LCDC0_BASE)
+#define preg ((pLCDC_REG)LCDC1_BASE)
 
 //LCDC_REG *preg = LCDC0_BASE;  
 LCDC_REG regbak;
@@ -325,6 +330,7 @@ LCDC_REG regbak;
 /* Configure VENC for a given Mode (NTSC / PAL) */
 void rk30_lcdc_set_par(struct fb_dsp_info *fb_info, vidinfo_t *vid)
 {
+	printf("%s [%d]\n",__FUNCTION__,__LINE__);
 	struct layer_par *par = &vid->par[fb_info->layer_id];
 	if(par == NULL){
 		printf("%s lay_par==NULL,id=%d\n",fb_info->layer_id);
@@ -334,6 +340,7 @@ void rk30_lcdc_set_par(struct fb_dsp_info *fb_info, vidinfo_t *vid)
 
 	switch(fb_info->layer_id){
 		case WIN0:
+			printf("%s --->WIN0 support \n", __FUNCTION__);
 			LcdWrReg(WIN0_SCL_FACTOR_YRGB, v_X_SCL_FACTOR(0x1000) | v_Y_SCL_FACTOR(0x1000));
 			LcdWrReg(WIN0_SCL_FACTOR_CBR,v_X_SCL_FACTOR(0x1000)| v_Y_SCL_FACTOR(0x1000));
 			LcdMskReg(SYS_CTRL, m_WIN0_FORMAT | m_WIN0_EN, v_WIN0_FORMAT(vid->logo_rgb_mode) | v_WIN0_EN(1) );	      //zyw
@@ -361,7 +368,12 @@ void rk30_lcdc_set_par(struct fb_dsp_info *fb_info, vidinfo_t *vid)
 					LcdWrReg(WIN0_VIR,v_RGB888_VIRWIDTH(fb_info->xvir));
 					break;
 			}
+			
 			LcdWrReg(WIN0_YRGB_MST0, fb_info->yaddr);
+			/*LcdWrReg(WIN0_CBR_MST0, 0x63c08000);
+			LcdWrReg(WIN0_YRGB_MST1, 0x63c08000);
+			LcdWrReg(WIN0_CBR_MST1, 0x63c08000);*/
+			printf("%s [%d] %d %d\n",__FUNCTION__,__LINE__, fb_info->yaddr, vid->vl_hbpd);
 			break;
 		case WIN1:
 			printf("%s --->WIN1 not support \n");

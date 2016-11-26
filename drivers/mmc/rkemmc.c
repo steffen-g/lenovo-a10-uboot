@@ -22,15 +22,18 @@ Revision:       1.00
 #define CONFIG_SYS_MMC_MAX_BLK_COUNT 65535
 #endif
 
+//#define DEBUG
+
+#ifdef DEBUG
+	#define debug(fmt, args...)	printf("%s %s: %d - "fmt, __FILE__, __FUNCTION__, __LINE__, ##args);
+#else
+	#define debug(fmt, args...)
+#endif
+
 static struct list_head mmc_devices;
 static int cur_dev_num = -1;
 
-int __weak board_mmc_getwp(struct mmc *mmc)
-{
-	return -1;
-}
-
-int mmc_getwp(struct mmc *mmc)
+int board_mmc_getwp(struct mmc *mmc)
 {
 	int wp;
 
@@ -45,13 +48,6 @@ int mmc_getwp(struct mmc *mmc)
 
 	return wp;
 }
-
-int __board_mmc_getcd(struct mmc *mmc) {
-	return -1;
-}
-
-int board_mmc_getcd(struct mmc *mmc)__attribute__((weak,
-	alias("__board_mmc_getcd")));
 
 struct mmc *find_mmc_device(int dev_num)
 {
@@ -129,6 +125,7 @@ block_dev_desc_t *mmc_get_dev(int dev)
 int mmc_init(struct mmc *mmc)
 {
 	int err = 0;
+	debug("calling SdmmcInit()\n");
 	SdmmcInit(2);
 	return err;
 }
@@ -169,7 +166,7 @@ int get_mmc_num(void)
 
 int mmc_initialize(bd_t *bis)
 {
-	printf("emmc_initialize\n");
+	debug("emmc_initialize\n");
 	INIT_LIST_HEAD (&mmc_devices);
 	cur_dev_num = 0;
 	struct mmc *mmc = malloc(sizeof(struct mmc));
@@ -181,12 +178,14 @@ int mmc_initialize(bd_t *bis)
 	print_mmc_devices(',');
 	 /* set up exceptions */
 	interrupt_init();
+	debug("left interrupt_init()\n");
 	/* enable exceptions */
 	enable_interrupts();
 	//SdmmcInit(2);
 	if( StorageInit() == 0)
-		printf("emmc init OK!\n");
+		printf("%d GB\n", StorageGetCapacity()/1024/1024);
 	else
 		printf("Fail!\n");
+		
 	return 0;
 }

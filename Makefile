@@ -5,9 +5,6 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-ARCH=arm 
-CROSS_COMPILE=arm-none-eabi-
-
 VERSION = 2014
 PATCHLEVEL = 01
 SUBLEVEL =

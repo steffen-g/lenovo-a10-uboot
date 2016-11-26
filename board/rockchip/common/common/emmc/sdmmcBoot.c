@@ -37,6 +37,10 @@ typedef struct SDCardInfoTag
 
 SD_Card_Info gSdCardInfoTbl[3];
 
+void mmc_legacy_init(){
+	SdmmcSDMInit();
+}
+
 void SdmmcSDMInit()
 {
 //    emmcGpioInit();

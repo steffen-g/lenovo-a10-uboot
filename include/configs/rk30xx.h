@@ -38,7 +38,7 @@ Revision:       1.00
  * Enabling relocation of u-boot by default
  * Relocation can be skipped if u-boot is copied to the TEXT_BASE
  */
-#undef CONFIG_SKIP_RELOCATE_UBOOT	/* to a proper address, init done */
+//#undef CONFIG_SKIP_RELOCATE_UBOOT	/* to a proper address, init done */
 
 /*
  * Size of malloc() pool
@@ -55,8 +55,8 @@ Revision:       1.00
 //define uboot loader addr.
 #ifdef CONFIG_SECOND_LEVEL_BOOTLOADER
 //2m offset for packed nand bin.
-#define CONFIG_SYS_TEXT_BASE    0x60200000
-#define RK_FLASH_BOOT_EN
+#define CONFIG_SYS_TEXT_BASE    0x60408000
+//#define RK_FLASH_BOOT_EN
 #else
 #define CONFIG_SYS_TEXT_BASE    0x60000000
 #define RK_SDMMC_BOOT_EN
@@ -95,8 +95,9 @@ Revision:       1.00
  * Environment setup
  */
 /* use preboot to detect key press for fastboot */
-#define CONFIG_PREBOOT
-#define CONFIG_BOOTCOMMAND "booti"
+//#define CONFIG_PREBOOT
+#define CONFIG_BOOTDELAY 5
+#define CONFIG_BOOTCOMMAND ""
 
 #define CONFIG_EXTRA_ENV_SETTINGS  "verify=n\0"
 
@@ -104,7 +105,6 @@ Revision:       1.00
 /*
  * Miscellaneous configurable options
  */
-#undef CONFIG_SYS_LONGHELP		/* undef to save memory */
 #undef CONFIG_SYS_HUSH_PARSER		/* use "hush" command parser	*/
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #define CONFIG_SYS_PROMPT	"rk30boot # "
@@ -170,10 +170,10 @@ Revision:       1.00
 /* Another macro may also be used or instead used to take care of the case
  * where fastboot is started at boot (to be incorporated) based on key press
  */
-#define CONFIG_CMD_FASTBOOT
-#define CONFIG_FASTBOOT_LOG
+//#define CONFIG_CMD_FASTBOOT 
+//#define CONFIG_FASTBOOT_LOG
 #define CONFIG_FASTBOOT_LOG_SIZE                    (SZ_2M)
-#define CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE_EACH   (SZ_16M)
+#define CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE_EACH   (SZ_16M) /* den scheiß brauchts es sonstwo ..... */
 //CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE should be at least 2*CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE_EACH,
 //and larger than our boot/recovery image size.
 #define CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE        (CONFIG_FASTBOOT_TRANSFER_BUFFER_SIZE_EACH << 1)
@@ -204,7 +204,10 @@ Revision:       1.00
 /* LCDC console */
 #define CONFIG_LCD
 #define CONFIG_RK_FB
-#define CONFIG_LCD_LOGO
+#undef CONFIG_LCD_LOGO
+#define CONFIG_LCD_FONT
+#undef LCD_TEST_PATTERN
+//#define CONFIG_SYS_DCACHE_OFF
 
 #define CONFIG_COMPRESS_LOGO_RLE8// CONFIG_COMPRESS_LOGO_RLE16
 
@@ -252,33 +255,61 @@ Revision:       1.00
 //#define CONFIG_BATTERY_RICOH619
 #define CONFIG_BATTERY_RK_SAMPLE  //battery driver
 
+#define CONFIG_SYS_LOAD_ADDR 0x64008000 /* check if useful */
 
 #undef CONFIG_GZIP
 #undef CONFIG_ZLIB
-#undef CONFIG_CMD_BOOTM
+//#undef CONFIG_CMD_BOOTM
 #undef CONFIG_CMD_BOOTD
 #undef CONFIG_CMD_ITEST
 #undef CONFIG_SOURCE
 #undef CONFIG_CMD_SOURCE
 #undef CONFIG_CMD_BDI
-#undef CONFIG_CMD_CONSOLE
-#undef CONFIG_CMD_CACHE
+#define CONFIG_CMD_CONSOLE
+#define CONFIG_CMD_CACHE
 #undef CONFIG_CMD_MEMORY
 #undef CONFIG_PARTITIONS
 #undef CONFIG_CMD_ECHO
 #undef CONFIG_CMD_REGINFO
 #undef CONFIG_CMDLINE_EDITING
 
+#define CONFIG_SYS_I2C_SPEED 100000
+#define CONFIG_CMD_I2C
+#define RK_SDMMC_BOOT_EN
+//#define RK_SDCARD_BOOT_EN
+
+#define CONFIG_LMB
+#define CONFIG_CMD_MEMORY
+#define CONFIG_CMD_RUN
+#define CONFIG_CMD_LOADB
+//#define CONFIG_CMD_GPIO
+//#define CONFIG_CMD_LOADS
+#define CONFIG_CTRLC
+//#define CONFIG_CMD_USB
+#define CONFIG_CMD_MMC
+#define CONFIG_GENERIC_MMC
+#define CONFIG_SYS_LONGHELP
+
+/* CONFIG_CMD_CONSOLE
+CONFIG_ENV_IS_NOWHERE
+CONFIG_CMD_EXT4
+CONFIG_CMD_MEMORY
+
+CONFIG_CMD_MISC
+CONFIG_CMD_USB_MASS_STORAGE */
+
 #define CONFIG_CMD_BMP
 //#define CONFIG_CMD_CHARGE_ANIM
 #define CONFIG_LCD_BMP_RLE8
+//#define CONFIG_SYS_WHITE_ON_BLACK
+//#define LCD_TEST_PATTERN
 
-#define CONFIG_QUICK_CHECKSUM
+//#define CONFIG_QUICK_CHECKSUM
 
 #define CONFIG_RK_I2C
 #define CONFIG_I2C_MULTI_BUS
 
 //allow to flash loader when check sign failed. should undef this in release version.
-#define CONFIG_ENABLE_ERASEKEY
+//#define CONFIG_ENABLE_ERASEKEY
 
 #endif /* __CONFIG_H */

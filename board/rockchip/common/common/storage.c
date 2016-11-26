@@ -14,6 +14,13 @@ Revision:   1.00
 #include    "../armlinux/config.h"
 #include    "storage.h"
 
+#define DEBUG
+
+#ifdef DEBUG
+	#define debug(fmt, args...)	printf("%s %s: %d - "fmt, __FILE__, __FUNCTION__, __LINE__, ##args);
+#else
+	#define debug(fmt, args...)
+#endif
 
 //TODO 
 extern void FtlReIntForUpdate(void);
@@ -339,7 +346,9 @@ uint16 SDBootVer = 0;
 int32 StorageInit(void)
 {
     uint32 ret;
+    debug("1\n");
     SdmmcSDMInit();
+    debug("2\n");
     gpSdBootMemFun = &sd0FunOp;
     ExtCardUserPartOffset = 0;
     if(gpSdBootMemFun->Init(gpSdBootMemFun->id) == 0) // 检查外接SD卡固件
@@ -348,6 +357,7 @@ int32 StorageInit(void)
         sdBootCheckSdCard(gpSdBootMemFun->id);
         ExtCardUserPartOffset = sdBootGetUserPartOffset(gpSdBootMemFun->id);
     }
+    debug("3\n");
 #ifdef RK_FLASH_BOOT_EN
     gpMemFun = &NandFunOp;
     FlashCsInit();

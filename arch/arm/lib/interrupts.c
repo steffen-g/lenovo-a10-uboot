@@ -22,6 +22,14 @@
 #include <common.h>
 #include <asm/proc-armv/ptrace.h>
 
+//#define DEBUG
+
+#ifdef DEBUG
+	#define debug(fmt, args...)	printf("%s %s: %d - "fmt, __FILE__, __FUNCTION__, __LINE__, ##args);
+#else
+	#define debug(fmt, args...)
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_USE_IRQ
@@ -33,6 +41,8 @@ int interrupt_init (void)
 	IRQ_STACK_START = gd->irq_sp - 4;
 	IRQ_STACK_START_IN = gd->irq_sp + 8;
 	FIQ_STACK_START = IRQ_STACK_START - CONFIG_STACKSIZE_IRQ;
+//rupt_init: 45 - Set irq stack 0x632cab2c, 0x632cab38, 0x632bab2c
+	debug("Set irq stack 0x%x, 0x%x, 0x%x\n", IRQ_STACK_START, IRQ_STACK_START_IN, FIQ_STACK_START);
 
 	return arch_interrupt_init();
 }

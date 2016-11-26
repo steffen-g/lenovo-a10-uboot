@@ -142,8 +142,10 @@ void IrqHandler(void)
 	//g_giccReg->ICCEOIR=intSrc;
 	//if((intSrc != USB_OTG_INT_CH) && (intSrc != INT_eMMC))
 	//	serial_printf("Irq: %d\n", intSrc);
+
     if (intSrc == USB_OTG_INT_CH)
     {
+#ifdef CONFIG_CMD_FASTBOOT
         if(RockusbEn)
             UsbIsr();
         else if(RockusbEn == 0)
@@ -152,6 +154,7 @@ void IrqHandler(void)
         else
             MscUsbIsr();
 #endif
+#endif //CONFIG_CMD_FASTBOOT
     }
 #ifdef    RK_SDMMC_BOOT_EN
     else if(intSrc == INT_eMMC)

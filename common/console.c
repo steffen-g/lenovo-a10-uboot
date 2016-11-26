@@ -16,7 +16,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#ifndef CONFIG_ROCKCHIP
+//#ifndef CONFIG_ROCKCHIP
 static int on_console(const char *name, const char *value, enum env_op op,
 	int flags)
 {
@@ -58,7 +58,7 @@ static int on_console(const char *name, const char *value, enum env_op op,
 	}
 }
 U_BOOT_ENV_CALLBACK(console, on_console);
-#endif //CONFIG_ROCKCHIP
+//#endif //CONFIG_ROCKCHIP
 
 #ifdef CONFIG_SILENT_CONSOLE
 static int on_silent(const char *name, const char *value, enum env_op op,
@@ -242,7 +242,7 @@ static inline void console_puts(int file, const char *s)
 	stdio_devices[file]->puts(s);
 }
 
-#ifdef CONFIG_ROCKCHIP
+//#ifdef CONFIG_ROCKCHIP
 static inline void console_printdevs(int file)
 {
 	printf("%s\n", stdio_devices[file]->name);
@@ -252,11 +252,11 @@ static inline void console_doenv(int file, struct stdio_dev *dev)
 {
 	console_setfile(file, dev);
 }
-#endif
+//#endif
 #endif /* defined(CONFIG_CONSOLE_MUX) */
 
 /** U-Boot INITIAL CONSOLE-NOT COMPATIBLE FUNCTIONS *************************/
-
+extern char lcd_is_active;
 int serial_printf(const char *fmt, ...)
 {
 	va_list args;
@@ -272,6 +272,8 @@ int serial_printf(const char *fmt, ...)
 	va_end(args);
 
 	serial_puts(printbuffer);
+	if(lcd_is_active)
+			lcd_puts(printbuffer);
 	return i;
 }
 
@@ -342,6 +344,8 @@ int fprintf(int file, const char *fmt, ...)
 
 	/* Send to desired file */
 	fputs(file, printbuffer);
+	if(lcd_is_active)
+		lcd_puts(printbuffer);
 	return i;
 }
 
@@ -473,10 +477,13 @@ void puts(const char *s)
 	if (gd->flags & GD_FLG_DEVINIT) {
 		/* Send to the standard output */
 		fputs(stdout, s);
+		if(lcd_is_active)
+			lcd_puts(s);
 	} else {
 		/* Send directly to the handler */
 		serial_puts(s);
 	}
+	
 }
 
 int printf(const char *fmt, ...)

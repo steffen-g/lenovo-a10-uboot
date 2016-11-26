@@ -863,8 +863,8 @@ static image_header_t *image_get_kernel(ulong img_addr, int verify)
 
 	if (!image_check_hcrc(hdr)) {
 		puts("Bad Header Checksum\n");
-		bootstage_error(BOOTSTAGE_ID_CHECK_HEADER);
-		return NULL;
+//		bootstage_error(BOOTSTAGE_ID_CHECK_HEADER);
+//		return NULL;
 	}
 
 	bootstage_mark(BOOTSTAGE_ID_CHECK_CHECKSUM);
@@ -874,8 +874,8 @@ static image_header_t *image_get_kernel(ulong img_addr, int verify)
 		puts("   Verifying Checksum ... ");
 		if (!image_check_dcrc(hdr)) {
 			printf("Bad Data CRC\n");
-			bootstage_error(BOOTSTAGE_ID_CHECK_CHECKSUM);
-			return NULL;
+//			bootstage_error(BOOTSTAGE_ID_CHECK_CHECKSUM);
+//			return NULL;
 		}
 		puts("OK\n");
 	}

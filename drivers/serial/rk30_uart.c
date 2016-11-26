@@ -196,7 +196,6 @@ int32 UARTInit(eUART_ch_t uartCh, uint32 baudRate)
 	return (0);
 }
 
-
 int32 UARTWriteByte(eUART_ch_t uartCh, uint8 byte)
 {
 
@@ -208,6 +207,7 @@ int32 UARTWriteByte(eUART_ch_t uartCh, uint8 byte)
 	while((puartRegStart->UART_USR & UART_TRANSMIT_FIFO_NOT_FULL) == 0);
 
 	puartRegStart->UART_THR = byte;
+		
 	return (0);
 }
 

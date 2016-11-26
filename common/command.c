@@ -13,7 +13,6 @@
 #include <command.h>
 #include <linux/ctype.h>
 
-#ifndef CONFIG_ROCKCHIP
 /*
  * Use puts() instead of printf() to avoid printf buffer overflow
  * for long help messages
@@ -84,7 +83,6 @@ int _do_help (cmd_tbl_t *cmd_start, int cmd_items, cmd_tbl_t * cmdtp, int
 	}
 	return rcode;
 }
-#endif //CONFIG_ROCKCHIP
 
 /***************************************************************************
  * find command table entry for a command

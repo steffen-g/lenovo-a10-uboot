@@ -101,6 +101,7 @@ enum {
 
 void board_fbt_set_reboot_type(enum fbt_reboot_type frt)
 {
+#ifdef CMD_FASTBOOT
     int boot = BOOT_NORMAL;
     switch(frt) {
         case FASTBOOT_REBOOT_BOOTLOADER:
@@ -121,10 +122,12 @@ void board_fbt_set_reboot_type(enum fbt_reboot_type frt)
             break;
     }
     ISetLoaderFlag(SYS_LOADER_REBOOT_FLAG|boot);
+#endif
 }
 
 enum fbt_reboot_type board_fbt_get_reboot_type(void)
 {
+#ifdef CMD_FASTBOOT
     enum fbt_reboot_type frt = FASTBOOT_REBOOT_UNKNOWN;
 
     uint32_t loader_flag = IReadLoaderFlag();
@@ -168,5 +171,8 @@ enum fbt_reboot_type board_fbt_get_reboot_type(void)
     }
 
     return frt;
+#else
+    return 0;
+#endif
 }
 

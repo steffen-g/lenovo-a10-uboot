@@ -170,6 +170,7 @@ int mmc_set_blocklen(struct mmc *mmc, int len)
 	return mmc_send_cmd(mmc, &cmd, NULL);
 }
 
+#if 0
 struct mmc *find_mmc_device(int dev_num)
 {
 	struct mmc *m;
@@ -188,7 +189,7 @@ struct mmc *find_mmc_device(int dev_num)
 
 	return NULL;
 }
-
+#endif
 static int mmc_read_blocks(struct mmc *mmc, void *dst, lbaint_t start,
 			   lbaint_t blkcnt)
 {
@@ -1170,6 +1171,7 @@ static int mmc_send_if_cond(struct mmc *mmc)
 	return 0;
 }
 
+#if 0
 int mmc_register(struct mmc *mmc)
 {
 	/* Setup dsr related values */
@@ -1191,6 +1193,7 @@ int mmc_register(struct mmc *mmc)
 
 	return 0;
 }
+#endif
 
 #ifdef CONFIG_PARTITIONS
 block_dev_desc_t *mmc_get_dev(int dev)
@@ -1275,7 +1278,7 @@ static int mmc_complete_init(struct mmc *mmc)
 	mmc->init_in_progress = 0;
 	return err;
 }
-
+#if 0
 int mmc_init(struct mmc *mmc)
 {
 	int err = IN_PROGRESS;
@@ -1291,7 +1294,7 @@ int mmc_init(struct mmc *mmc)
 	debug("%s: %d, time %lu\n", __func__, err, get_timer(start));
 	return err;
 }
-
+#endif
 int mmc_set_dsr(struct mmc *mmc, u16 val)
 {
 	mmc->dsr = val;
@@ -1310,6 +1313,7 @@ static int __def_mmc_init(bd_t *bis)
 int cpu_mmc_init(bd_t *bis) __attribute__((weak, alias("__def_mmc_init")));
 int board_mmc_init(bd_t *bis) __attribute__((weak, alias("__def_mmc_init")));
 
+#if 0
 #if !defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
 
 void print_mmc_devices(char separator)
@@ -1332,12 +1336,13 @@ void print_mmc_devices(char separator)
 #else
 void print_mmc_devices(char separator) { }
 #endif
-
+#endif
+#if 0
 int get_mmc_num(void)
 {
 	return cur_dev_num;
 }
-
+#endif
 void mmc_set_preinit(struct mmc *mmc, int preinit)
 {
 	mmc->preinit = preinit;
@@ -1356,7 +1361,7 @@ static void do_preinit(void)
 	}
 }
 
-
+#if 0
 int mmc_initialize(bd_t *bis)
 {
 	INIT_LIST_HEAD (&mmc_devices);
@@ -1372,6 +1377,7 @@ int mmc_initialize(bd_t *bis)
 	do_preinit();
 	return 0;
 }
+#endif
 
 #ifdef CONFIG_SUPPORT_EMMC_BOOT
 /*

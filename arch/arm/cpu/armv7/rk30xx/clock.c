@@ -122,6 +122,7 @@ void rkclk_set_pll(void)
 
 void lcdc_clk_enable(void)
 {
+	printf("enabling lcdc clock\n");
     int clk = 300;
     uint32 div = (CONFIG_RKCLK_GPLL_FREQ-1)/clk;
     if(div>0x1f)div = 0x1f;
@@ -140,6 +141,7 @@ void set_lcdc_dclk(int clk)
     printf("set_lcdc_dclk: lcdc_source_clk = %d, clk = %d, div = %d\n", (div==div1)?CONFIG_RKCLK_GPLL_FREQ:CONFIG_RKCLK_CPLL_FREQ, clk, div);
     g_cruReg->CRU_CLKSEL_CON[27] = (1<<16) | (0xff<<24) | (div<<8) | ((div==div1)?1:0);     //lcdc0_dclk
     g_cruReg->CRU_CLKSEL_CON[20] = (1<<16) | (0xff<<24) | (div<<8) | ((div==div1)?1:0);     //lcdc1_dclk
+    g_cruReg->CRU_CLKSEL_CON[28] = (1<<16) | (0xff<<24) | (div<<8) | ((div==div1)?1:0); 
 }
 #if(CONFIG_RKCHIPTYPE == CONFIG_RK3026)
 uint32 GetMmcCLK(void)

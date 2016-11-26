@@ -11,7 +11,7 @@
 /* ** HEADER FILES							*/
 /************************************************************************/
 
-/* #define DEBUG */
+ #define DEBUG 
 
 #include <config.h>
 #include <common.h>
@@ -210,11 +210,13 @@ static inline void console_newline(void)
 
 void lcd_putc(const char c)
 {
+	//printf("lcd_putc %c %d\n", c, lcd_is_enabled);
 	if (!lcd_is_enabled) {
-		serial_putc(c);
+		//serial_putc(c);
 
 		return;
 	}
+	//printf("lcd_putc %c \n", c);
 	switch (c) {
 	case '\r':
 		console_col = 0;
@@ -248,6 +250,8 @@ void lcd_putc(const char c)
 
 void lcd_puts(const char *s)
 {
+	//printf("lcd_puts \"%s\" on lcd %x\n", s, lcd_is_enabled);
+	//lcd_is_enabled = 1;
 	if (!lcd_is_enabled) {
 		serial_puts(s);
 
@@ -270,6 +274,8 @@ void lcd_printf(const char *fmt, ...)
 	va_start(args, fmt);
 	vsprintf(buf, fmt, args);
 	va_end(args);
+	
+	//printf("lcd_printf %s on lcd\n", buf);
 
 	lcd_puts(buf);
 }
@@ -280,7 +286,7 @@ void lcd_printf(const char *fmt, ...)
 
 static void lcd_drawchars(ushort x, ushort y, uchar *str, int count)
 {
-	uchar *dest;
+	uchar *dest = lcd_base;
 	ushort row;
 
 #if defined(CONFIG_LCD_LOGO) && !defined(CONFIG_LCD_INFO_BELOW_LOGO)
@@ -326,6 +332,7 @@ static void lcd_drawchars(ushort x, ushort y, uchar *str, int count)
 			}
 #elif LCD_BPP == LCD_COLOR16
 			for (c = 0; c < 8; ++c) {
+				//printf("printing fg: %x, gb %x, d 0x%x, %x, %x\n", lcd_color_fg, lcd_color_bg, d, *d, bits);
 				*d++ = (bits & 0x80) ?
 						lcd_color_fg : lcd_color_bg;
 				bits <<= 1;
@@ -416,7 +423,7 @@ int drv_lcd_init(void)
 {
 	struct stdio_dev lcddev;
 	int rc;
-
+	printf("drv_lcd_init\n");
 	lcd_base = (void *) gd->fb_base;
 
 	lcd_init(lcd_base);		/* LCD initialization */
@@ -505,7 +512,7 @@ U_BOOT_CMD(
 static int lcd_init(void *lcdbase)
 {
 	/* Initialize the lcd controller */
-	debug("[LCD] Initializing LCD frambuffer at %p\n", lcdbase);
+	debug("[LCD] Initializing LCD framebuffer at %p\n", lcdbase);
 
 	lcd_ctrl_init(lcdbase);
 
@@ -518,10 +525,10 @@ static int lcd_init(void *lcdbase)
 	if ((unsigned long)lcdbase != gd->fb_base)
 		lcd_base = (void *)gd->fb_base;
 
-	debug("[LCD] Using LCD frambuffer at %p\n", lcd_base);
+	debug("[LCD] Using LCD framebuffer at %p\n", lcd_base);
 
 	lcd_get_size(&lcd_line_length);
-	lcd_is_enabled = 1;
+	
 	lcd_clear();
 	lcd_enable();
 
@@ -533,6 +540,7 @@ static int lcd_init(void *lcdbase)
 	console_row = 1;	/* leave 1 blank line below logo */
 #endif
 
+	lcd_is_enabled = 1;
 	return 0;
 }
 
@@ -578,6 +586,7 @@ ulong lcd_setmem(ulong addr)
 static void lcd_setfgcolor(int color)
 {
 	lcd_color_fg = color;
+	printf("fg color = %x\n", color);
 }
 
 /*----------------------------------------------------------------------*/
@@ -585,6 +594,7 @@ static void lcd_setfgcolor(int color)
 static void lcd_setbgcolor(int color)
 {
 	lcd_color_bg = color;
+	printf("bg color = %x\n", color);
 }
 
 /*----------------------------------------------------------------------*/
@@ -1201,10 +1211,10 @@ static void *lcd_logo(void)
 			return (void *)lcd_base;
 	}
 #endif /* CONFIG_SPLASH_SCREEN */
-
+#ifdef CONFIG_LCD_LOGO
 	bitmap_plot((panel_info.vl_col - BMP_LOGO_WIDTH)/2, (panel_info.vl_row - BMP_LOGO_HEIGHT)/2);
     //bitmap_plot(0,0);
-
+#endif
 #ifdef CONFIG_LCD_INFO
 	console_col = LCD_INFO_X / VIDEO_FONT_WIDTH;
 	console_row = LCD_INFO_Y / VIDEO_FONT_HEIGHT;

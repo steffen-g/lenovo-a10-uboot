@@ -21,6 +21,7 @@ void *g_lcdbase=NULL;
 
 static void lcd_panel_on(vidinfo_t *vid)
 {
+	printf("%s [%d]\n",__FUNCTION__,__LINE__);
     if (vid->lcd_power_on)
         vid->lcd_power_on();
     udelay(vid->power_on_delay);
@@ -45,6 +46,8 @@ void lcd_ctrl_init(void *lcdbase)
     panel_width = panel_info.vl_width;
     panel_height = panel_info.vl_height;
     g_lcdbase = lcdbase;
+    
+    panel_info.par[0].fb_info.yaddr = lcdbase;
 
     rk30_lcdc_init();
     rk30_load_screen(&panel_info);
